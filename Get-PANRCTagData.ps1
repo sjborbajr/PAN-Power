@@ -1,4 +1,4 @@
-Function Get-PANAuthPart {
+Function Get-PANRCTagData {
 <#
 .SYNOPSIS
   This will return the portion of the uri to authenticate based on a tag
@@ -56,18 +56,18 @@ Function Get-PANAuthPart {
     #Format
     Switch ($Data.Type){
       'API_Key' {
-        $Return = 'key='+$Data.API_Key
+        $Return = @{'Auth' = 'key='+$Data.API_Key; 'Addresses'=$Data.Addresses}
       }
       'SecureAPI_Key' {
         if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $env:COMPUTERNAME ) {
-          $Return = 'key='+$Data.API_Key.GetNetworkCredential().password
+          $Return = @{'Auth' = 'key='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
         } else {
           #Key stored by different computer/user
         }
       }
       'SecureUserAndPass' {
         if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $env:COMPUTERNAME ) {
-          $Return = 'user='+$Data.API_Key.GetNetworkCredential().password+'password='+$Data.API_Key.GetNetworkCredential().password
+          $Return = @{'Auth' = 'user='+$Data.API_Key.GetNetworkCredential().password+'password='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
         } else {
           #Key stored by different computer/user
         }
