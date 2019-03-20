@@ -35,7 +35,7 @@ Function Invoke-PANKeyGen {
     PS C:\> <Example>
     
 .NOTES
-    Author: Steve Borba
+    Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
     Last Edit: 2019-03-20
     Version 1.0 - initial release
 
