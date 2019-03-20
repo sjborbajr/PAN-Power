@@ -13,6 +13,7 @@ Powershell - tested with version 5 and up
 ## License
 
 This project is licensed under the Apache License Version 2.0 - see the [LICENSE](LICENSE) file for details
+A lot of the inspiration for ideas in this comes from emulating pan-python with their license https://github.com/kevinsteves/pan-python/blob/master/LICENSE.txt [LICENSE-PANPYTHON](LICENSE-PANPYTHON)
 
 ## Acknowledgments
 
