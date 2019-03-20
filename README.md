@@ -16,6 +16,7 @@ This project is licensed under the Apache License Version 2.0 - see the [LICENSE
 
 ## Acknowledgments
 
+* PAN python was the base for many of the ideas as well as the API browser and "debug cli on"
 * I did use many google searches and ideas, and tried to acknowledge anything that was a direct copy in the script
 * Inspired by my colleagues including James Castello, Scot Hargan, Jason Coleman
-
+* Also inspired by classes at ignite and PS Summit
