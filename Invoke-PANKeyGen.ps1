@@ -22,10 +22,10 @@ Function Invoke-PANKeyGen {
       The firewall must have the same master key for this to work
 
 .PARAMETER StorageMeathod 
-   Storage Meathod 1 - Clear key like pan-python
-   Storage Meathod 2 - Secured with Windows secure string tied to the user/pc
-   Storage Meathod 3 - Just store the username and password in windows secure string, but use keygen to validate password
-   <not implemented> Storage Meathod 4 - Secured, but using a shared secret that can be stored for the user/pc combination
+   API_Key - Clear key like pan-python
+   SecureAPI_Key - Secured with Windows secure string tied to the user/pc
+   SecureUserAndPass - Just store the username and password in windows secure string, but use keygen to validate password
+   <not implemented> SharedSecureAPI_Key - Secured, but using a shared secret that can be stored for the user/pc combination
 
 .PARAMETER Path
    Path to the file to store data, check current directory, otherwise use profile directory
@@ -56,9 +56,9 @@ Function Invoke-PANKeyGen {
     $Tag,
 
     [Parameter(Mandatory=$False)]
-    [ValidateSet(1,2,3)]
-    [int]
-    $StorageMeathod = 2,
+    [ValidateSet('API_Key','SecureAPI_Key','SecureUserAndPass')]
+    [string]
+    $StorageMeathod = 'SecureAPI_Key',
 
     [Parameter(Mandatory=$False)]
     [string]
@@ -85,16 +85,16 @@ Function Invoke-PANKeyGen {
     
     #Format
     Switch ($StorageMeathod){
-      1 {
+      'API_Key' {
         $Data = @{$Tag = @{Type = 'API_Key'; Addresses=$Addresses; API_Key=$API_Key; TimeStamp=(Get-Date)}}
       }
-      2 {
+      'SecureAPI_Key' {
         $Data = @{$Tag = @{Type = 'SecureAPI_Key'; Addresses=$Addresses; API_Key=(New-Object System.Management.Automation.PSCredential -ArgumentList 'API_Key', ($API_Key | ConvertTo-SecureString -AsPlainText -Force)); TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
       }
-      3 {
+      'SecureUserAndPass' {
         $Data = @{$Tag = @{Type = 'SecureUserAndPass'; Addresses=$Addresses; Credential=$Credential; TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
       }
-      4 {
+      'SharedSecureAPI_Key' {
         #not implemented
       }
     }
