@@ -7,21 +7,19 @@ Function Invoke-PANKeyGen {
 .DESCRIPTION
   In pan-python, the keys are stored in the clear in a file called .panrc in the users home folder
   I like this idea, but windows allows me to store in a secure string format that allows only the user/pc combination to retrieve the key
-  I also want to allow users to colaborate without having to get their own keys
-  This is good, but can be frustrating when using scheduled tasks and/or multiple PCs
-  So, I am going to make things difficult and write something to support three ways to store the key
+    I want to allow users to colaborate/share keys it can be frustrating when using scheduled tasks and/or multiple PCs
 
-  With this change in formatting, reusing the .panrc file would cause conflict, so I will use panrc.xml to store
+  With this change in formatting, reusing the .panrc file would cause conflict, so I will use panrc.xml
 
 .PARAMETER Credential
     This is the user account that will be used to create the key.
 
 .PARAMETER Tag
-    This is the shortname to use to reference a key and a set of addresses
+    This is the shortname to use to reference a key and set of addresses
 
 .PARAMETER Addresses
     This is a set of addresses to store with the Tag, the key with be generated against the first address
-    The firewall should have the same master key or you will run into issues
+      The firewall must have the same master key for this to work
 
 .PARAMETER StorageMeathod 
    Storage Meathod 1 - Clear key like pan-python
@@ -39,9 +37,10 @@ Function Invoke-PANKeyGen {
 .NOTES
     Author: Steve Borba
     Last Edit: 2019-03-20
-    Version 1.0 - initial release, only Meathod 2 and 
+    Version 1.0 - initial release
 
 #>
+
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$True)]
