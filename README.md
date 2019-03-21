@@ -21,4 +21,4 @@ A lot of the inspiration for ideas in this comes from emulating pan-python with 
 * I did use many google searches and ideas, and tried to acknowledge anything that was a direct copy in the script
 * Inspired by my colleagues including James Castello, Scot Hargan, Jason Coleman
 * Also inspired by classes at ignite and PS Summit
-* Google led me to brianaddicks a lot https://github.com/brianaddicks/PowerAlto, but his looks more complete like Power-CLI and mine is more generic like pan-py
+* Google led me to brianaddicks a lot https://github.com/brianaddicks/PowerAlto, but his looks more like VMware Power-CLI and mine is more generic like pan-py
