@@ -1,4 +1,4 @@
-# Palo Alto Networks Scripts
+# PAN Power
 
 This is a collection of scripts I have made to help me manage, configure, and explorer Palo Alto Networks Products
 
