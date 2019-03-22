@@ -82,9 +82,15 @@
   $Return = @()
   ForEach ($Address in $Addresses) {
     $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=op&cmd=$Command&"+$TagData.Auth)
+    $Response.response.status
     if ( $Response.response.status -eq 'success' ) {
-      $Return = $Return + $Response.response.result.entry
+      if ($Response.response.result.entry.Length -gt 0) {
+        $Return = $Return + $Response.response.result.entry
+      } else {
+        $Return = $Return + $Response.response.result
+      }
     }
   }
   $Return
+  Return
 }
