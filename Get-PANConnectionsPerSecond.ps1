@@ -1,4 +1,4 @@
-Function Get-PANConnectionsPerSecond {
+﻿Function Get-PANConnectionsPerSecond {
 <#
 .SYNOPSIS
   This will query a firewall for it's interfaces and connection per second information and return summary information
