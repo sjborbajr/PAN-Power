@@ -1,4 +1,4 @@
-Function Invoke-PANOperation {
+﻿Function Invoke-PANOperation {
 <#
 .SYNOPSIS
   This will run the operations passed and retun the result in xml
@@ -25,8 +25,8 @@ Function Invoke-PANOperation {
    Path to the file that has the tag data
 
 .EXAMPLE
-    The example below does blah
-    PS C:\> <Example>
+    The example below retrieves the rib table from the edge firewalls
+    PS C:\> $BGP_Routes = Invoke-PANOperation -Command '<show><routing><protocol><bgp><loc-rib/></bgp></protocol></routing></show>' -Tag 'EdgeGroup'
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
@@ -65,6 +65,17 @@ Function Invoke-PANOperation {
   $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
   If ($Addresses -eq '' -or $Addresses -eq $null) {
     $Addresses = $TagData.Addresses
+  }
+  
+  if ($Credential) {
+    $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
+  } Else {
+    If ($TagData.Auth) {
+      $Auth = $TagData.Auth
+    } else {
+      "No Authentication Information Found"
+      return
+    }
   }
 
   #Run the command and get the results

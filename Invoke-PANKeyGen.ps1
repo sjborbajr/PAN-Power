@@ -31,11 +31,11 @@ Function Invoke-PANKeyGen {
    Path to the file to store data, check current directory, otherwise use profile directory
 
 .EXAMPLE
-    The example below does blah
-    PS C:\> <Example>
+    The example below get a Key from 192.168.7.250 and stores it in a group called AllEdge and the addresses associated
+    PS C:\> Invoke-PANKeyGen -Tag 'AllEdge' -Addresses @('192.168.7.250','192.168.1.1','10.10.10.1')
     
 .NOTES
-    Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
+    Author: Steve Borba
     Last Edit: 2019-03-20
     Version 1.0 - initial release
 

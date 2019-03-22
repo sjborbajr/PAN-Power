@@ -1,4 +1,4 @@
-Function Get-PANSessions {
+﻿Function Get-PANSessions {
 <#
 .SYNOPSIS
   This will return the portion of the uri to authenticate based on a tag
@@ -29,8 +29,9 @@ Function Get-PANSessions {
    The Filter to apply to the query
 
 .EXAMPLE
-    The example below does blah
-    PS C:\> <Example>
+    The example below gets session that have been active for more than an hour
+    PS C:\> Get-PANSessions -Tag 'EdgeFirewalls' -Filter '<min-age>3600</min-age><type>flow</type><state>active</state><min-kb>1</min-kb>' | Out-GridView
+
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts

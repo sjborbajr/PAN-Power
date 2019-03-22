@@ -18,10 +18,6 @@ Function Get-PANRCTagData {
 .PARAMETER Path
    Path to the file to store data, check current directory, otherwise use profile directory
 
-.EXAMPLE
-    The example below does blah
-    PS C:\> <Example>
-
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
     Last Edit: 2019-03-20
@@ -67,7 +63,7 @@ Function Get-PANRCTagData {
       }
       'SecureUserAndPass' {
         if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $env:COMPUTERNAME ) {
-          $Return = @{'Auth' = 'user='+$Data.API_Key.GetNetworkCredential().password+'password='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
+          $Return = @{'Auth' = 'user='+$Data.API_Key.UserName+'password='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
         } else {
           #Key stored by different computer/user
         }
@@ -78,6 +74,7 @@ Function Get-PANRCTagData {
     }
     $Return
   } Else {
-    #Tag Not found in panrc
+    "Tag Not found in panrc"
+    return
   }
 }
