@@ -4,7 +4,7 @@ This is a collection of scripts I have made to help me manage, configure, and ex
 
 ### Prerequisites
 
-Powershell - tested with version 5 and up
+Powershell - tested with version 5 and 6.2
 
 ## Authors
 
