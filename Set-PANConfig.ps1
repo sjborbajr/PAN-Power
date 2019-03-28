@@ -1,13 +1,13 @@
-﻿Function Invoke-PANOperation {
+﻿Function Set-PANConfig {
 <#
 .SYNOPSIS
-  This will run the operations passed and retun the result in xml
+  This will run pull the config and retun the result in xml
 
 .DESCRIPTION
-  This runs the operation passed, to find what operations are possible, use "debug cli on" and run command not in 
+  This pull configuration based on the path requested
 
 .PARAMETER Addresses
-    This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
+    This is a set of addresses to get the config from, The firewalls must have the same master key for this to work
 
 .PARAMETER Key
     This is a key to just use
@@ -16,17 +16,20 @@
     This is a user account to just use
 
 .PARAMETER Tag
-    This is the shortname to use to reference auth information and addresses
+    This is the shortname to use to reference auth information and addresses from the panrc file
 
-.PARAMETER Command
-    This is the operation command you want to run
+.PARAMETER XPath
+    This is location from which to get the config
+
+.PARAMETER Data
+    This is location from which to get the config
 
 .PARAMETER Path
-   Path to the file that has the tag data
+   Path to the panrc file that has the tag data
 
 .EXAMPLE
-    The example below retrieves the rib table from the edge firewalls
-    PS C:\> $BGP_Routes = Invoke-PANOperation -Command '<show><routing><protocol><bgp><loc-rib/></bgp></protocol></routing></show>' -Tag 'EdgeGroup'
+    The example below retrieves the config from the default firewall (no tag)
+    PS C:\> 
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
@@ -48,9 +51,13 @@
     [string[]]
     $Addresses,
 
-    [Parameter(Mandatory=$False)]
+    [Parameter(Mandatory=$True)]
     [string]
-    $Command,
+    $XPath,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $Data,
 
     [Parameter(Mandatory=$False)]
     [string]
@@ -81,14 +88,8 @@
   #Run the command and get the results
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=op&cmd=$Command&"+$Auth)
-    if ( $Response.response.status -eq 'success' ) {
-      if ($Response.response.result.entry.Length -gt 0) {
-        $Return = $Return + $Response.response.result.entry
-      } else {
-        $Return = $Return + $Response.response.result
-      }
-    }
+    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=set&xpath=$XPath&element=$Data&"+$Auth)
+    $Return = $Return + $Response.response
   }
   $Return
   Return
