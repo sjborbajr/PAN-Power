@@ -21,6 +21,9 @@
 .PARAMETER XPath
     This is location from which to get the config
 
+.PARAMETER Running
+    If this is flagged, get the active instead of candidate configuration
+
 .PARAMETER Path
    Path to the panrc file that has the tag data
 
@@ -53,6 +56,10 @@
     $XPath,
 
     [Parameter(Mandatory=$False)]
+    [Switch]
+    $Running,
+
+    [Parameter(Mandatory=$False)]
     [string]
     $Key,
 
@@ -78,10 +85,12 @@
     }
   }
 
+  If ($Running) { $Action = "show" } else { $Action = "get" }
+
   #Run the command and get the results
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=get&xpath=$XPath&"+$Auth)
+    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=$Action&xpath=$XPath&"+$Auth)
     if ( $Response.response.status -eq 'success' ) {
       if ($Response.response.result.entry.Length -gt 0) {
         $Return = $Return + $Response.response.result.entry
