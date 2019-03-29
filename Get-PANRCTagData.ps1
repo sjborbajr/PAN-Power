@@ -37,11 +37,11 @@ Function Get-PANRCTagData {
   )
 
   #Get the Path if not supplied
-  if ($Path -eq '') {
+  if ($Path -eq '' -or $Path.Length -le 0) {
     if (Test-Path "panrc.xml") {
       $Path = "panrc.xml"
     } else {
-      $env:USERPROFILE+"\panrc.xml"
+      $Path = $env:USERPROFILE+"\panrc.xml"
     }
   }
 
