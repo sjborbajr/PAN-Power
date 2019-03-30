@@ -28,13 +28,14 @@
    Path to the panrc file that has the tag data
 
 .EXAMPLE
-    The example below retrieves the config from the default firewall (no tag)
-    PS C:\> 
+    The example below retrieves the entire config from the default firewall and exports it in xml to a file
+    PS C:\> (Get-PANConfig).config.OuterXml | Out-File "Config.xml"
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
-    Last Edit: 2019-03-21
-    Version 1.0 - initial release
+    Last Edit: 2019-03-29
+    Version 1.0   - initial release
+    Version 1.0.1 - Adding notes and updating some error handling
 
 #>
   [CmdletBinding()]
@@ -86,17 +87,21 @@
   }
 
   If ($Running) { $Action = "show" } else { $Action = "get" }
-
+  #Allowing blank XPath to report full config
+  If ($XPath)   { $XPath = "&xpath=$XPath" } else {$XPath = "&xpath=/config"}
   #Run the command and get the results
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=$Action&xpath=$XPath&"+$Auth)
+    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=$Action$XPath&"+$Auth)
     if ( $Response.response.status -eq 'success' ) {
       if ($Response.response.result.entry.Length -gt 0) {
         $Return = $Return + $Response.response.result.entry
       } else {
         $Return = $Return + $Response.response.result
       }
+    } else {
+      $Response.response
+      Return
     }
   }
   $Return

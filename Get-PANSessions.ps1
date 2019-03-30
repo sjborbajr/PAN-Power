@@ -90,6 +90,9 @@
       #  <protocol>6|17</protocol>
       #  <ssl-decrypt>yes|no</ssl-decrypt>
       #}
+    } else {
+      $Response.response
+      Return
     }
   }
 

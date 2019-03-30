@@ -28,8 +28,8 @@
    Path to the panrc file that has the tag data
 
 .EXAMPLE
-    The example below retrieves the config from the default firewall (no tag)
-    PS C:\> 
+    The example below disables a rule called "Certbot to RPi"
+    PS C:\> Set-PANConfig -Data  '<disabled>yes</disabled>' -XPath "/config/devices/entry/vsys/entry/rulebase/security/rules/entry[@name='Certbot to RPi']"
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts

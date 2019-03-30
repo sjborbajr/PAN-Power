@@ -115,7 +115,8 @@ Function Invoke-PANKeyGen {
       $FileData = @{Tags=$Data}
     }
     $FileData | Export-Clixml $Path
-  } Else {
-    #Rest Method failed
+  } else {
+    $Response.response
+    Return
   }
 }

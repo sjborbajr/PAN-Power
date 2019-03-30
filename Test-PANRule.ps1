@@ -52,8 +52,8 @@
    Path to the file that has the tag data
 
 .EXAMPLE
-    The example below 
-    PS C:\> 
+    The example below will return all rules that could match a ping packet from the inside to outside
+    PS C:\> $result = Test-PANRule -from "Inside" -to "Outside" -source '192.0.2.2' -destination '1.1.1.1' -protocol 1 -category 'any' -Show_All
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
@@ -63,66 +63,21 @@
 #>
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Tag,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Path = '',
-
-    [Parameter(Mandatory=$False)]
-    [string[]]
-    $Addresses,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Key,
-
-    [Parameter(Mandatory=$False)]
-    [System.Management.Automation.PSCredential]
-    $Credential,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $from,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $to,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $source,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $destination,
-
-    [Parameter(Mandatory=$False)]
-    [int]
-    $protocol,
-
-    [Parameter(Mandatory=$False)]
-    [int]
-    $destination_port,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $application,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $source_user,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $category,
-
-    [Parameter(Mandatory=$False)]
-    [Switch]
-    $Show_All
-
+    [Parameter(Mandatory=$False)] [string]   $Tag,
+    [Parameter(Mandatory=$False)] [string]   $Path = '',
+    [Parameter(Mandatory=$False)] [string[]] $Addresses,
+    [Parameter(Mandatory=$False)] [string]   $Key,
+    [Parameter(Mandatory=$False)] [System.Management.Automation.PSCredential] $Credential,
+    [Parameter(Mandatory=$False)] [string]   $from,
+    [Parameter(Mandatory=$False)] [string]   $to,
+    [Parameter(Mandatory=$False)] [string]   $source,
+    [Parameter(Mandatory=$False)] [string]   $destination,
+    [Parameter(Mandatory=$False)] [int]      $protocol,
+    [Parameter(Mandatory=$False)] [int]      $destination_port,
+    [Parameter(Mandatory=$False)] [string]   $application,
+    [Parameter(Mandatory=$False)] [string]   $source_user,
+    [Parameter(Mandatory=$False)] [string]   $category,
+    [Parameter(Mandatory=$False)] [Switch]   $Show_All
   )
 
   #Get Data from panrc based on tag
@@ -142,6 +97,7 @@
     }
   }
 
+  #Build the command
   $Command = ''
   If ($from)             { $Command =             "$Command<from>$from</from>"                         }
   If ($to)               { $Command =               "$Command<to>$to</to>"                             }

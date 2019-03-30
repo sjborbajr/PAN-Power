@@ -88,6 +88,9 @@
       } else {
         $Return = $Return + $Response.response.result
       }
+    } else {
+      $Response.response
+      Return
     }
   }
   $Return
