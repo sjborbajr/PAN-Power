@@ -73,7 +73,7 @@
 
   #Get Data from panrc based on tag
   $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
-  If ($Addresses -eq '' -or $Addresses -eq $null) {
+  If ($Addresses -eq '' -or $null -eq $Addresses) {
     $Addresses = $TagData.Addresses
   }
 

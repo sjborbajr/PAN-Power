@@ -4,7 +4,7 @@
   This will run the operations passed and retun the result in xml
 
 .DESCRIPTION
-  This runs the operation passed, to find what operations are possible, use "debug cli on" and run command not in 
+  This runs the operation passed, to find what operations are possible, use "debug cli on" and run command to find some to use.
 
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
@@ -63,10 +63,10 @@
 
   #Get Data from panrc based on tag
   $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
-  If ($Addresses -eq '' -or $Addresses -eq $null) {
+  If ($Addresses -eq '' -or $null -eq $Addresses) {
     $Addresses = $TagData.Addresses
   }
-  
+
   if ($Credential) {
     $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
   } Else {

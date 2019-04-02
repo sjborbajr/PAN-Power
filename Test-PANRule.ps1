@@ -4,7 +4,7 @@
   This will run the operations passed and retun the result in xml
 
 .DESCRIPTION
-  This runs the operation passed, to find what operations are possible, use "debug cli on" and run command not in 
+  This runs the command test security-policy-match with the filters provided.
 
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
@@ -70,9 +70,9 @@
     [Parameter(Mandatory=$False)] [System.Management.Automation.PSCredential] $Credential,
     [Parameter(Mandatory=$False)] [string]   $from,
     [Parameter(Mandatory=$False)] [string]   $to,
-    [Parameter(Mandatory=$False)] [string]   $source,
-    [Parameter(Mandatory=$False)] [string]   $destination,
-    [Parameter(Mandatory=$False)] [int]      $protocol,
+    [Parameter(Mandatory=$true)]  [string]   $source,
+    [Parameter(Mandatory=$true)]  [string]   $destination,
+    [Parameter(Mandatory=$true)]  [int]      $protocol,
     [Parameter(Mandatory=$False)] [int]      $destination_port,
     [Parameter(Mandatory=$False)] [string]   $application,
     [Parameter(Mandatory=$False)] [string]   $source_user,
@@ -82,10 +82,10 @@
 
   #Get Data from panrc based on tag
   $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
-  If ($Addresses -eq '' -or $Addresses -eq $null) {
+  If ($Addresses -eq '' -or $null -eq $Addresses) {
     $Addresses = $TagData.Addresses
   }
-  
+
   if ($Credential) {
     $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
   } Else {

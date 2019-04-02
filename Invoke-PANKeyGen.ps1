@@ -21,7 +21,7 @@ Function Invoke-PANKeyGen {
     This is a set of addresses to store with the Tag, the key with be generated against the first address
       The firewall must have the same master key for this to work
 
-.PARAMETER StorageMeathod 
+.PARAMETER StorageMeathod
    API_Key - Clear key like pan-python
    SecureAPI_Key - Secured with Windows secure string tied to the user/pc
    SecureUserAndPass - Just store the username and password in windows secure string, but use keygen to validate password
@@ -33,7 +33,7 @@ Function Invoke-PANKeyGen {
 .EXAMPLE
     The example below get a Key from 192.168.7.250 and stores it in a group called AllEdge and the addresses associated
     PS C:\> Invoke-PANKeyGen -Tag 'AllEdge' -Addresses @('192.168.7.250','192.168.1.1','10.10.10.1')
-    
+
 .NOTES
     Author: Steve Borba
     Last Edit: 2019-03-20
@@ -63,7 +63,7 @@ Function Invoke-PANKeyGen {
     [Parameter(Mandatory=$False)]
     [string]
     $Path = ''
-    
+
   )
 
   #Make sure the addresses variable is an array of strings
@@ -82,7 +82,7 @@ Function Invoke-PANKeyGen {
         $env:USERPROFILE+"\panrc.xml"
       }
     }
-    
+
     #Format
     Switch ($StorageMeathod){
       'API_Key' {
@@ -96,10 +96,18 @@ Function Invoke-PANKeyGen {
       }
       'SharedSecureAPI_Key' {
         #not implemented
+        #$plainText = "Some Super Secret Password"
+        #$key = Set-Key "AGoodKeyThatNoOneElseWillKnow"
+        #$encryptedTextThatIcouldSaveToFile = Set-EncryptedData -key $key -plainText $plaintext
+        #$encryptedTextThatIcouldSaveToFile
+        #507964ed3a197b26969adead0212743c378a478c64007c477efbb21be5748670a7543cb21135ec324e37f80f66d17c76c4a75f6783de126658bce09ef19d50da
+        #$DecryptedText = Get-EncryptedData -data $encryptedTextThatIcouldSaveToFile -key $key
+        #$DecryptedText
+        #Some Super Secret Password
       }
     }
-    
-    #Store - Check to see if it already exists, replace, add, or create
+
+    #Store - Check to see if it already exists, replace, add, or create new file
     If (Test-Path $Path) {
       $FileData = Import-Clixml $Path
       If ($FileData.Tags) {

@@ -47,7 +47,7 @@ Function Get-PANRCTagData {
 
   #Get data out of file
   $Data = ((Import-Clixml $Path)['Tags'])[$Tag]
-  
+
   If ($Data) {
     #Format
     Switch ($Data.Type){
