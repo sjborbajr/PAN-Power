@@ -1,6 +1,6 @@
 # PAN Power
 
-This is a collection of scripts I have made to help me manage, configure, and explorer Palo Alto Networks Products
+This is a collection of functions I made to interact with the the XML API and help me manage, configure, and explorer Palo Alto Networks Products
 
 ### Prerequisites
 
