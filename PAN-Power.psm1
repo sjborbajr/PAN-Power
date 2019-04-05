@@ -576,7 +576,8 @@ Function Invoke-PANKeyGen {
     $Response.response
     Return
   }
-}﻿Function Invoke-PANOperation {
+}
+﻿Function Invoke-PANOperation {
 <#
 .SYNOPSIS
   This will run PAN-OS operation commands and retun the result in xml
