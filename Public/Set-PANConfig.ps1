@@ -56,7 +56,7 @@ Function Set-PANConfig {
   }
 
   if ($Credential) {
-    $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
+    $Auth = 'user='+$Credential.UserName+'&password='+$Credential.GetNetworkCredential().password
   } Else {
     If ($TagData.Auth) {
       $Auth = $TagData.Auth

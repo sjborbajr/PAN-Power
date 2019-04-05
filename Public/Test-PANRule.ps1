@@ -96,7 +96,7 @@ Function Test-PANRule {
 
   #Use other authentication (credential/key), if passed
   if ($Credential) {
-    $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
+    $Auth = 'user='+$Credential.UserName+'&password='+$Credential.GetNetworkCredential().password
   } Else {
     If ($Key.Length -gt 0) {
       $Auth = "key=$Key"
