@@ -1,4 +1,4 @@
-﻿Function Test-PANRule {
+Function Test-PANRule {
 <#
 .SYNOPSIS
   This will run the operations passed and retun the result in xml
