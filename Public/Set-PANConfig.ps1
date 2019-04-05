@@ -18,9 +18,6 @@ Function Set-PANConfig {
 .PARAMETER Key
     This is a key to just use
 
-.PARAMETER Credential
-    This is a user account to just use
-
 .PARAMETER Tag
     This is the shortname to use to reference auth information and addresses
 
@@ -36,6 +33,7 @@ Function Set-PANConfig {
     Last Edit: 2019-04-05
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
+    Version 1.0.3 - Remove Direct Credential option
 
 #>
   [CmdletBinding()]
@@ -45,8 +43,7 @@ Function Set-PANConfig {
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
-    [Parameter(Mandatory=$False)]  [string]    $Key,
-    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
+    [Parameter(Mandatory=$False)]  [string]    $Key
   )
 
   #Get Data from panrc based on tag
@@ -55,9 +52,10 @@ Function Set-PANConfig {
     $Addresses = $TagData.Addresses
   }
 
-  if ($Credential) {
-    $Auth = 'user='+$Credential.UserName+'&password='+$Credential.GetNetworkCredential().password
-  } Else {
+  #Use other key if passed
+  If ($Key.Length -gt 0) {
+    $Auth = "key=$Key"
+  } else {
     If ($TagData.Auth) {
       $Auth = $TagData.Auth
     } else {

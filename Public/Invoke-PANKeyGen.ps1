@@ -14,14 +14,10 @@ Function Invoke-PANKeyGen {
 .PARAMETER StorageMeathod
    API_Key - Clear key like pan-python
    SecureAPI_Key - Secured with Windows secure string tied to the user/pc
-   SecureUserAndPass - Just store the username and password in windows secure string, but use keygen to validate password
    <not implemented> SharedSecureAPI_Key - Secured, but using a shared secret that can be stored for the user/pc combination
 
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
-
-.PARAMETER Key
-    This is a key to just use
 
 .PARAMETER Credential
     This is a user account to just use
@@ -41,18 +37,18 @@ Function Invoke-PANKeyGen {
     Last Edit: 2019-04-05
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
+    Version 1.0.3 - update manditory fields
 
 #>
 
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)][ValidateSet('API_Key','SecureAPI_Key','SecureUserAndPass')]
+    [Parameter(Mandatory=$False)][ValidateSet('API_Key','SecureAPI_Key')]
                                    [string]    $StorageMeathod = 'SecureAPI_Key',
-    [Parameter(Mandatory=$False)]  [string]    $Tag,
+    [Parameter(Mandatory=$False)]  [string]    $Tag = '',
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
-    [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
-    [Parameter(Mandatory=$False)]  [string]    $Key,
-    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
+    [Parameter(Mandatory=$true)]   [string[]]  $Addresses,
+    [Parameter(Mandatory=$True)]   [System.Management.Automation.PSCredential]   $Credential
   )
 
   #Make sure the addresses variable is an array of strings
@@ -79,9 +75,6 @@ Function Invoke-PANKeyGen {
       }
       'SecureAPI_Key' {
         $Data = @{$Tag = @{Type = 'SecureAPI_Key'; Addresses=$Addresses; API_Key=(New-Object System.Management.Automation.PSCredential -ArgumentList 'API_Key', ($API_Key | ConvertTo-SecureString -AsPlainText -Force)); TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
-      }
-      'SecureUserAndPass' {
-        $Data = @{$Tag = @{Type = 'SecureUserAndPass'; Addresses=$Addresses; Credential=$Credential; TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
       }
       'SharedSecureAPI_Key' {
         #not implemented - notes on how I can do it

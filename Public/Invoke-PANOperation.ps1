@@ -15,9 +15,6 @@ Function Invoke-PANOperation {
 .PARAMETER Key
     This is a key to just use
 
-.PARAMETER Credential
-    This is a user account to just use
-
 .PARAMETER Tag
     This is the shortname to use to reference auth information and addresses
 
@@ -33,16 +30,16 @@ Function Invoke-PANOperation {
     Last Edit: 2019-04-05
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
+    Version 1.0.3 - Remove Direct Credential option
 
 #>
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)]  [string]    $Command,
+    [Parameter(Mandatory=$True)]   [string]    $Command,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
-    [Parameter(Mandatory=$False)]  [string]    $Key,
-    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
+    [Parameter(Mandatory=$False)]  [string]    $Key
   )
 
   #Get Data from panrc based on tag, an empty tag is "ok" and returns data
@@ -58,19 +55,15 @@ Function Invoke-PANOperation {
     }
   }
 
-  #Use other authentication (credential/key), if passed
-  if ($Credential) {
-    $Auth = 'user='+$Credential.UserName+'&password='+$Credential.GetNetworkCredential().password
-  } Else {
-    If ($Key.Length -gt 0) {
-      $Auth = "key=$Key"
+  #Use other key if passed
+  If ($Key.Length -gt 0) {
+    $Auth = "key=$Key"
+  } else {
+    If ($TagData.Auth) {
+      $Auth = $TagData.Auth
     } else {
-      If ($TagData.Auth) {
-        $Auth = $TagData.Auth
-      } else {
-        "No Authentication Information Found"
-        return
-      }
+      "No Authentication Information Found"
+      return
     }
   }
 
