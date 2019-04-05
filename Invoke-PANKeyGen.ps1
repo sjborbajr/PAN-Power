@@ -11,77 +11,66 @@ Function Invoke-PANKeyGen {
 
   With this change in formatting, reusing the .panrc file would cause conflict, so I will use panrc.xml
 
-.PARAMETER Credential
-    This is the user account that will be used to create the key.
-
-.PARAMETER Tag
-    This is the shortname to use to reference a key and set of addresses
-
-.PARAMETER Addresses
-    This is a set of addresses to store with the Tag, the key with be generated against the first address
-      The firewall must have the same master key for this to work
-
 .PARAMETER StorageMeathod
    API_Key - Clear key like pan-python
    SecureAPI_Key - Secured with Windows secure string tied to the user/pc
    SecureUserAndPass - Just store the username and password in windows secure string, but use keygen to validate password
    <not implemented> SharedSecureAPI_Key - Secured, but using a shared secret that can be stored for the user/pc combination
 
+.PARAMETER Addresses
+    This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
+
+.PARAMETER Key
+    This is a key to just use
+
+.PARAMETER Credential
+    This is a user account to just use
+
+.PARAMETER Tag
+    This is the shortname to use to reference auth information and addresses
+
 .PARAMETER Path
    Path to the file to store data, check current directory, otherwise use profile directory
 
 .EXAMPLE
-    The example below get a Key from 192.168.7.250 and stores it in a group called AllEdge and the addresses associated
-    PS C:\> Invoke-PANKeyGen -Tag 'AllEdge' -Addresses @('192.168.7.250','192.168.1.1','10.10.10.1')
+    The example below get a Key from 192.0.2.1 and stores it in a group called AllEdge along with the three addresses associated
+    PS C:\> Invoke-PANKeyGen -Tag 'AllEdge' -Addresses @('192.0.2.1','198.51.100.1','203.0.113.1')
 
 .NOTES
-    Author: Steve Borba
-    Last Edit: 2019-03-20
+    Author: Steve Borba https://github.com/sjborbajr/PAN-Power
+    Last Edit: 2019-04-05
     Version 1.0 - initial release
+    Version 1.0.1 - Updating descriptions and formatting
 
 #>
 
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$True)]
-    [System.Management.Automation.PSCredential]
-    $Credential,
-
-    [Parameter(Mandatory=$True)]
-    [string[]]
-    $Addresses,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Tag,
-
-    [Parameter(Mandatory=$False)]
-    [ValidateSet('API_Key','SecureAPI_Key','SecureUserAndPass')]
-    [string]
-    $StorageMeathod = 'SecureAPI_Key',
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Path = ''
-
+    [Parameter(Mandatory=$False)][ValidateSet('API_Key','SecureAPI_Key','SecureUserAndPass')]
+                                   [string]    $StorageMeathod = 'SecureAPI_Key',
+    [Parameter(Mandatory=$False)]  [string]    $Tag,
+    [Parameter(Mandatory=$False)]  [string]    $Path = '',
+    [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
+    [Parameter(Mandatory=$False)]  [string]    $Key,
+    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
   )
 
   #Make sure the addresses variable is an array of strings
   If ($Addresses.GetType().Name -eq 'String') {$Addresses = @($Addresses)}
 
+  #Get the Path if not supplied
+  if ($Path -eq '') {
+    if (Test-Path "panrc.xml") {
+      $Path = "panrc.xml"
+    } else {
+      $path = $env:USERPROFILE+"\panrc.xml"
+    }
+  }
+
   #Get the key
   $Response = Invoke-RestMethod (("https://"+$Addresses[0]+"/api/?type=keygen&user="+$Credential.username+"&password="+$Credential.GetNetworkCredential().password))
   if ( $Response.response.status -eq 'success' ) {
     $API_Key = $Response.response.result.key
-
-    #Get the Path if not supplied
-    if ($Path -eq '') {
-      if (Test-Path "panrc.xml") {
-        $Path = "panrc.xml"
-      } else {
-        $env:USERPROFILE+"\panrc.xml"
-      }
-    }
 
     #Format
     Switch ($StorageMeathod){
@@ -95,7 +84,7 @@ Function Invoke-PANKeyGen {
         $Data = @{$Tag = @{Type = 'SecureUserAndPass'; Addresses=$Addresses; Credential=$Credential; TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
       }
       'SharedSecureAPI_Key' {
-        #not implemented
+        #not implemented - notes on how I can do it
         #$plainText = "Some Super Secret Password"
         #$key = Set-Key "AGoodKeyThatNoOneElseWillKnow"
         #$encryptedTextThatIcouldSaveToFile = Set-EncryptedData -key $key -plainText $plaintext
@@ -107,7 +96,7 @@ Function Invoke-PANKeyGen {
       }
     }
 
-    #Store - Check to see if it already exists, replace, add, or create new file
+    #Store - Check to see if xml exists, then if entry exists, and create, replace, or add as appropriate
     If (Test-Path $Path) {
       $FileData = Import-Clixml $Path
       If ($FileData.Tags) {
@@ -123,6 +112,8 @@ Function Invoke-PANKeyGen {
       $FileData = @{Tags=$Data}
     }
     $FileData | Export-Clixml $Path
+    $Response.response.status
+    Return
   } else {
     $Response.response
     Return

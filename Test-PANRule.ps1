@@ -6,18 +6,6 @@
 .DESCRIPTION
   This runs the command test security-policy-match with the filters provided.
 
-.PARAMETER Addresses
-    This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
-
-.PARAMETER Key
-    This is a key to just use
-
-.PARAMETER Credential
-    This is a user account to just use
-
-.PARAMETER Tag
-    This is the shortname to use to reference auth information and addresses
-
 .PARAMETER from
     Source Zone
 
@@ -48,6 +36,18 @@
 .PARAMETER Show_All
     Flag to show all results
 
+.PARAMETER Addresses
+    This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
+
+.PARAMETER Key
+    This is a key to just use
+
+.PARAMETER Credential
+    This is a user account to just use
+
+.PARAMETER Tag
+    This is the shortname to use to reference auth information and addresses
+
 .PARAMETER Path
    Path to the file that has the tag data
 
@@ -56,44 +56,57 @@
     PS C:\> $result = Test-PANRule -from "Inside" -to "Outside" -source '192.0.2.2' -destination '1.1.1.1' -protocol 1 -category 'any' -Show_All
 
 .NOTES
-    Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
-    Last Edit: 2019-03-29
+    Author: Steve Borba https://github.com/sjborbajr/PAN-Power
+    Last Edit: 2019-04-05
     Version 1.0 - initial release
+    Version 1.0.1 - Updating descriptions and formatting
 
 #>
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)] [string]   $Tag,
-    [Parameter(Mandatory=$False)] [string]   $Path = '',
-    [Parameter(Mandatory=$False)] [string[]] $Addresses,
-    [Parameter(Mandatory=$False)] [string]   $Key,
-    [Parameter(Mandatory=$False)] [System.Management.Automation.PSCredential] $Credential,
-    [Parameter(Mandatory=$False)] [string]   $from,
-    [Parameter(Mandatory=$False)] [string]   $to,
-    [Parameter(Mandatory=$true)]  [string]   $source,
-    [Parameter(Mandatory=$true)]  [string]   $destination,
-    [Parameter(Mandatory=$true)]  [int]      $protocol,
-    [Parameter(Mandatory=$False)] [int]      $destination_port,
-    [Parameter(Mandatory=$False)] [string]   $application,
-    [Parameter(Mandatory=$False)] [string]   $source_user,
-    [Parameter(Mandatory=$False)] [string]   $category,
-    [Parameter(Mandatory=$False)] [Switch]   $Show_All
+    [Parameter(Mandatory=$False)]  [string]    $from,
+    [Parameter(Mandatory=$False)]  [string]    $to,
+    [Parameter(Mandatory=$true)]   [string]    $source,
+    [Parameter(Mandatory=$true)]   [string]    $destination,
+    [Parameter(Mandatory=$true)]   [int]       $protocol,
+    [Parameter(Mandatory=$False)]  [int]       $destination_port,
+    [Parameter(Mandatory=$False)]  [string]    $application,
+    [Parameter(Mandatory=$False)]  [string]    $source_user,
+    [Parameter(Mandatory=$False)]  [string]    $category,
+    [Parameter(Mandatory=$False)]  [Switch]    $Show_All,
+    [Parameter(Mandatory=$False)]  [string]    $Tag,
+    [Parameter(Mandatory=$False)]  [string]    $Path = '',
+    [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
+    [Parameter(Mandatory=$False)]  [string]    $Key,
+    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
   )
 
-  #Get Data from panrc based on tag
+  #Get Data from panrc based on tag, an empty tag is "ok" and returns data
   $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
+
+  #If addresses were not passed, use addresses from panrc
   If ($Addresses -eq '' -or $null -eq $Addresses) {
-    $Addresses = $TagData.Addresses
+    If ($TagData.Addresses) {
+      $Addresses = $TagData.Addresses
+    } else {
+      "No Addresses Found"
+      Return
+    }
   }
 
+  #Use other authentication (credential/key), if passed
   if ($Credential) {
     $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
   } Else {
-    If ($TagData.Auth) {
-      $Auth = $TagData.Auth
+    If ($Key.Length -gt 0) {
+      $Auth = "key=$Key"
     } else {
-      "No Authentication Information Found"
-      return
+      If ($TagData.Auth) {
+        $Auth = $TagData.Auth
+      } else {
+        "No Authentication Information Found"
+        return
+      }
     }
   }
 
@@ -112,20 +125,23 @@
   $command = "<test><security-policy-match>$Command</security-policy-match></test>"
 
   #Run the command and get the results
+  $Type = "op"
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=op&cmd=$Command&"+$Auth)
+    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=$Type&cmd=$Command&"+$Auth)
     if ( $Response.response.status -eq 'success' ) {
-      if ($Response.response.result.entry.Length -gt 0) {
-        $Return = $Return + $Response.response.result.entry
-      } else {
-        $Return = $Return + $Response.response.result
-      }
+      $Return = $Return + $Response.response
     } else {
-      $Response.response
-      Return
+      $Return = $Return + $Response.response
+      If (1 -eq 2) { 
+        #Need flag to determine if we should quit on first error
+        $Return
+        Return
+      }
     }
   }
+
+  #Pass the data back
   $Return
   Return
 }

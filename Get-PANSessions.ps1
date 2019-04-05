@@ -1,13 +1,16 @@
 ﻿Function Get-PANSessions {
 <#
 .SYNOPSIS
-  This will return the portion of the uri to authenticate based on a tag
+  This will querry the active session table based on the filter provided
 
 .DESCRIPTION
-  This will return the portion of the uri to authenticate based on a tag
+  This will querry the active session table based on the filter provided
+
+.PARAMETER Filter
+   The Filter to apply to the query
 
 .PARAMETER Addresses
-    This is a set of addresses to run command on, The firewalls must have the same master key for this to work
+    This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
 
 .PARAMETER Key
     This is a key to just use
@@ -16,17 +19,10 @@
     This is a user account to just use
 
 .PARAMETER Tag
-    This is the shortname to use to reference a key and set of addresses
+    This is the shortname to use to reference auth information and addresses
 
 .PARAMETER Path
-   Path to the file to store data, check current directory, otherwise use profile directory
-
-.PARAMETER Large <NOT IMPLEMENTED>
-   If set to true, will interate through filters to attempt to get as much data as possible.
-     The API response appears to be limited to a specific number of items
-
-.PARAMETER Filter
-   The Filter to apply to the query
+   Path to the file that has the tag data
 
 .EXAMPLE
     The example below gets session that have been active for more than an hour
@@ -34,47 +30,54 @@
 
 
 .NOTES
-    Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
-    Last Edit: 2019-03-20
+    Author: Steve Borba https://github.com/sjborbajr/PAN-Power
+    Last Edit: 2019-04-05
     Version 1.0 - initial release
+    Version 1.0.1 - Updating descriptions and formatting
 
 #>
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Tag,
+    [Parameter(Mandatory=$False)]  [string]    $Filter,
+    [Parameter(Mandatory=$False)]  [string]    $Tag,
+    [Parameter(Mandatory=$False)]  [string]    $Path = '',
+    [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
+    [Parameter(Mandatory=$False)]  [string]    $Key,
+    [Parameter(Mandatory=$False)]  [System.Management.Automation.PSCredential]   $Credential
+)
 
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Path = '',
+  #Get Data from panrc based on tag, an empty tag is "ok" and returns data
+  $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
 
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Filter,
+  #If addresses were not passed, use addresses from panrc
+  If ($Addresses -eq '' -or $null -eq $Addresses) {
+    If ($TagData.Addresses) {
+      $Addresses = $TagData.Addresses
+    } else {
+      "No Addresses Found"
+      Return
+    }
+  }
 
-    [Parameter(Mandatory=$False)]
-    [string[]]
-    $Addresses,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Key,
-
-    [Parameter(Mandatory=$False)]
-    [System.Management.Automation.PSCredential]
-    $Credential
-  )
+  #Use other authentication (credential/key), if passed
+  if ($Credential) {
+    $Auth = 'user='+$Credential.UserName+'password='+$Credential.GetNetworkCredential().password
+  } Else {
+    If ($Key.Length -gt 0) {
+      $Auth = "key=$Key"
+    } else {
+      If ($TagData.Auth) {
+        $Auth = $TagData.Auth
+      } else {
+        "No Authentication Information Found"
+        return
+      }
+    }
+  }
 
   #Make Sure the filter has the outer XML tags
   If ($Filter.Length -gt 1 -and -not ($Filter -imatch '<filter>')) {
       $Filter = '<filter>'+$Filter+'</filter>'
-  }
-
-  #Get Data from panrc based on tag
-  $TagData = Get-PANRCTagData -Tag $Tag -Path $Path
-  If ($Addresses -eq '' -or $null -eq $Addresses) {
-    $Addresses = $TagData.Addresses
   }
 
   #Grab the sessions from all the firewalls
@@ -96,7 +99,7 @@
     }
   }
 
-  #For some reason a firewall I was working on included session that were built during the query, filtering them out if the time is less than a minute
+  #A firewall queeried sometimes includes sessions built during query, filtering if time is less than a minute and filter set min age greater than a minute
   if ((0+([xml]$Filter).filter.'min-age') -gt 60) {
     $i = 0
     While ($i -lt $Sessions.Count){

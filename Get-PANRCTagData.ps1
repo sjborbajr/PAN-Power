@@ -13,27 +13,23 @@ Function Get-PANRCTagData {
    <not implemented> SharedSecureAPI_Key - Secured, but using a shared secret that can be stored for the user/pc combination
 
 .PARAMETER Tag
-    This is the shortname to use to reference a key and set of addresses
+    This is the shortname to use to reference auth information and addresses
 
 .PARAMETER Path
    Path to the file to store data, check current directory, otherwise use profile directory
 
 .NOTES
-    Author: Steve Borba https://github.com/sjborbajr/PaloAltoNetworksScripts
-    Last Edit: 2019-03-20
+    Author: Steve Borba https://github.com/sjborbajr/PAN-Power
+    Last Edit: 2019-04-05
     Version 1.0 - initial release
+    Version 1.0.1 - Updating descriptions and formatting
 
 #>
 
   [CmdletBinding()]
   Param (
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Tag,
-
-    [Parameter(Mandatory=$False)]
-    [string]
-    $Path = ''
+    [Parameter(Mandatory=$False)]    [string]    $Tag,
+    [Parameter(Mandatory=$False)]    [string]    $Path = ''
   )
 
   #Get the Path if not supplied
