@@ -1,4 +1,4 @@
-﻿Function Set-PANConfig {
+Function Set-PANConfig {
 <#
 .SYNOPSIS
   This will set configuration based on the xml and path provided
