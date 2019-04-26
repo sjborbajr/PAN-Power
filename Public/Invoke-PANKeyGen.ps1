@@ -38,6 +38,8 @@ Function Invoke-PANKeyGen {
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
     Version 1.0.3 - update manditory fields
+    Version 1.0.4 - Update to use HOME on linux
+    Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
 
 #>
 
@@ -45,6 +47,7 @@ Function Invoke-PANKeyGen {
   Param (
     [Parameter(Mandatory=$False)][ValidateSet('API_Key','SecureAPI_Key')]
                                    [string]    $StorageMeathod = 'SecureAPI_Key',
+    [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag = '',
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$true)]   [string[]]  $Addresses,
@@ -59,12 +62,26 @@ Function Invoke-PANKeyGen {
     if (Test-Path "panrc.xml") {
       $Path = "panrc.xml"
     } else {
-      $path = $env:USERPROFILE+"\panrc.xml"
+      if ($env:USERPROFILE) {
+        $Path = $env:USERPROFILE+"\panrc.xml"
+      } elseif ($env:HOME) {
+        $Path = $env:HOME+"\panrc.xml"
+      } else {
+        $Path = (pwd).path+"\panrc.xml"
+      }
     }
   }
 
   #Get the key
-  $Response = Invoke-RestMethod (("https://"+$Addresses[0]+"/api/?type=keygen&user="+$Credential.username+"&password="+$Credential.GetNetworkCredential().password))
+  $HashArguments = @{
+    URI = "https://"+$Addresses[0]+"/api/?type=keygen&user="+[uri]::EscapeDataString($Credential.username)+"&password="+[uri]::EscapeDataString($Credential.GetNetworkCredential().password)
+  }
+  If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
+    $HashArguments += @{
+      SkipCertificateCheck = $True
+    }
+  }
+  $Response = Invoke-RestMethod @HashArguments
   if ( $Response.response.status -eq 'success' ) {
     $API_Key = $Response.response.result.key
 
@@ -74,7 +91,8 @@ Function Invoke-PANKeyGen {
         $Data = @{$Tag = @{Type = 'API_Key'; Addresses=$Addresses; API_Key=$API_Key; TimeStamp=(Get-Date)}}
       }
       'SecureAPI_Key' {
-        $Data = @{$Tag = @{Type = 'SecureAPI_Key'; Addresses=$Addresses; API_Key=(New-Object System.Management.Automation.PSCredential -ArgumentList 'API_Key', ($API_Key | ConvertTo-SecureString -AsPlainText -Force)); TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$env:COMPUTERNAME}}}
+        If ($env:COMPUTERNAME) {$ComputerName=$env:COMPUTERNAME} elseif ($env:HOSTNAME) {$ComputerName=$env:HOSTNAME} else {$ComputerName=''}
+        $Data = @{$Tag = @{Type = 'SecureAPI_Key'; Addresses=$Addresses; API_Key=(New-Object System.Management.Automation.PSCredential -ArgumentList 'API_Key', ($API_Key | ConvertTo-SecureString -AsPlainText -Force)); TimeStamp=(Get-Date); Combo=@{USERNAME=$env:USERNAME;COMPUTERNAME=$ComputerName}}}
       }
       'SharedSecureAPI_Key' {
         #not implemented - notes on how I can do it

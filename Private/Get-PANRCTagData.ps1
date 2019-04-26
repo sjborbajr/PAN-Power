@@ -9,7 +9,6 @@ Function Get-PANRCTagData {
  StorageMeathod:
    API_Key - Clear key like pan-python
    SecureAPI_Key - Secured with Windows secure string tied to the user/pc
-   SecureUserAndPass - Just store the username and password in windows secure string, but use keygen to validate password
    <not implemented> SharedSecureAPI_Key - Secured, but using a shared secret that can be stored for the user/pc combination
 
 .PARAMETER Tag
@@ -23,6 +22,7 @@ Function Get-PANRCTagData {
     Last Edit: 2019-04-05
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
+    Version 1.0.4 - Update to use HOME on linux
 
 #>
 
@@ -37,7 +37,13 @@ Function Get-PANRCTagData {
     if (Test-Path "panrc.xml") {
       $Path = "panrc.xml"
     } else {
-      $Path = $env:USERPROFILE+"\panrc.xml"
+      if ($env:USERPROFILE) {
+        $Path = $env:USERPROFILE+"\panrc.xml"
+      } elseif ($env:HOME) {
+        $Path = $env:HOME+"\panrc.xml"
+      } else {
+        $Path = (pwd).path+"\panrc.xml"
+      }
     }
   }
 
@@ -51,15 +57,9 @@ Function Get-PANRCTagData {
         $Return = @{'Auth' = 'key='+$Data.API_Key; 'Addresses'=$Data.Addresses}
       }
       'SecureAPI_Key' {
-        if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $env:COMPUTERNAME ) {
+        If ($env:COMPUTERNAME) {$ComputerName=$env:COMPUTERNAME} elseif ($env:HOSTNAME) {$ComputerName=$env:HOSTNAME} else {$ComputerName=''}
+        if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $ComputerName ) {
           $Return = @{'Auth' = 'key='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
-        } else {
-          #Key stored by different computer/user
-        }
-      }
-      'SecureUserAndPass' {
-        if ($Data.Combo.USERNAME -eq $env:USERNAME -and $Data.Combo.COMPUTERNAME -eq $env:COMPUTERNAME ) {
-          $Return = @{'Auth' = 'user='+$Data.API_Key.UserName+'password='+$Data.API_Key.GetNetworkCredential().password; 'Addresses'=$Data.Addresses}
         } else {
           #Key stored by different computer/user
         }

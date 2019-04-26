@@ -58,6 +58,7 @@ Function Test-PANRule {
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
     Version 1.0.3 - Remove Direct Credential option
+    Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
 
 #>
   [CmdletBinding()]
@@ -72,6 +73,7 @@ Function Test-PANRule {
     [Parameter(Mandatory=$False)]  [string]    $source_user,
     [Parameter(Mandatory=$False)]  [string]    $category,
     [Parameter(Mandatory=$False)]  [Switch]    $Show_All,
+    [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
@@ -117,11 +119,19 @@ Function Test-PANRule {
   If ($Show_All)         { $Command =         "$Command<show-all>yes</show-all>"                       }
   $command = "<test><security-policy-match>$Command</security-policy-match></test>"
 
-  #Run the command and get the results
+    #Run the command and get the results
   $Type = "op"
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=$Type&cmd=$Command&"+$Auth)
+    $HashArguments = @{
+      URI = "https://"+$Address+"/api/?type=$Type&cmd=$Command&"+$Auth
+    }
+    If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
+      $HashArguments += @{
+        SkipCertificateCheck = $True
+      }
+    }
+    $Response = Invoke-RestMethod @HashArguments
     if ( $Response.response.status -eq 'success' ) {
       $Return = $Return + $Response.response
     } else {

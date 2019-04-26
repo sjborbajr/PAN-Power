@@ -35,12 +35,14 @@
     Version 1.0.1 - Adding notes and updating some error handling
     Version 1.0.2 - Updating descriptions and formatting
     Version 1.0.3 - Remove Direct Credential option
+    Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
 
 #>
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$False)]  [string]    $XPath,
     [Parameter(Mandatory=$False)]  [Switch]    $Running,
+    [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
@@ -81,7 +83,15 @@
   #Run the command and get the results
   $Return = @()
   ForEach ($Address in $Addresses) {
-    $Response = Invoke-RestMethod ("https://"+$Address+"/api/?type=config&action=$Action$XPath&"+$Auth)
+    $HashArguments = @{
+      URI = "https://"+$Address+"/api/?type=config&action=$Action$XPath&"+$Auth
+    }
+    If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
+      $HashArguments += @{
+        SkipCertificateCheck = $True
+      }
+    }
+    $Response = Invoke-RestMethod @HashArguments
     if ( $Response.response.status -eq 'success' ) {
       $Return = $Return + $Response.response
     } else {
