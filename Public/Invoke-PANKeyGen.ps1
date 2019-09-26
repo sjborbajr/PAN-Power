@@ -80,7 +80,7 @@ Function Invoke-PANKeyGen {
     $HashArguments += @{
       SkipCertificateCheck = $True
     }
-  }
+  } else { Ignore-CertificateValidation }
   $Response = Invoke-RestMethod @HashArguments
   if ( $Response.response.status -eq 'success' ) {
     $API_Key = $Response.response.result.key
