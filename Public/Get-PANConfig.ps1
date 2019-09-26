@@ -90,7 +90,7 @@
       $HashArguments += @{
         SkipCertificateCheck = $True
       }
-    }
+    } else { Ignore-CertificateValidation }
     $Response = Invoke-RestMethod @HashArguments
     if ( $Response.response.status -eq 'success' ) {
       $Return = $Return + $Response.response
