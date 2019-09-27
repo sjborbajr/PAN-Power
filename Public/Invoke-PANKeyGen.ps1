@@ -40,6 +40,7 @@ Function Invoke-PANKeyGen {
     Version 1.0.3 - update manditory fields
     Version 1.0.4 - Update to use HOME on linux
     Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
+    Version 1.0.6 - added Edit config and commit and cert check skip for 5
 
 #>
 
@@ -76,11 +77,11 @@ Function Invoke-PANKeyGen {
   $HashArguments = @{
     URI = "https://"+$Addresses[0]+"/api/?type=keygen&user="+[uri]::EscapeDataString($Credential.username)+"&password="+[uri]::EscapeDataString($Credential.GetNetworkCredential().password)
   }
-  If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
-    $HashArguments += @{
-      SkipCertificateCheck = $True
+    If ($SkipCertificateCheck) {
+      If ($Host.Version.Major -ge 6) {
+        $HashArguments += @{SkipCertificateCheck = $True
+      } else { Ignore-CertificateValidation }
     }
-  } else { Ignore-CertificateValidation }
   $Response = Invoke-RestMethod @HashArguments
   if ( $Response.response.status -eq 'success' ) {
     $API_Key = $Response.response.result.key
