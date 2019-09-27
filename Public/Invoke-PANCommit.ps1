@@ -71,7 +71,7 @@ Function Invoke-PANCommit {
     }
     If ($SkipCertificateCheck) {
       If ($Host.Version.Major -ge 6) {
-        $HashArguments += @{SkipCertificateCheck = $True
+        $HashArguments += @{SkipCertificateCheck = $True}
       } else { Ignore-CertificateValidation }
     }
     $Response = Invoke-RestMethod @HashArguments
