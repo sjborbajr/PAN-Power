@@ -69,11 +69,11 @@ Function Invoke-PANCommit {
     $HashArguments = @{
       URI = "https://"+$Address+"/api/?type=$Type&cmd=<commit></commit>&"+$Auth
     }
-    If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
-      $HashArguments += @{
-        SkipCertificateCheck = $True
-      }
-    } else { Ignore-CertificateValidation }
+    If ($SkipCertificateCheck) {
+      If ($Host.Version.Major -ge 6) {
+        $HashArguments += @{SkipCertificateCheck = $True
+      } else { Ignore-CertificateValidation }
+    }
     $Response = Invoke-RestMethod @HashArguments
     if ( $Response.response.status -eq 'success' ) {
       $Return = $Return + $Response.response
