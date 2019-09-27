@@ -32,6 +32,7 @@ Function Invoke-PANOperation {
     Version 1.0.1 - Updating descriptions and formatting
     Version 1.0.3 - Remove Direct Credential option
     Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
+    Version 1.0.6 - added Edit config and commit and cert check skip for 5
 
 #>
   [CmdletBinding()]
@@ -76,11 +77,11 @@ Function Invoke-PANOperation {
     $HashArguments = @{
       URI = "https://"+$Address+"/api/?type=$Type&cmd=$Command&"+$Auth
     }
-    If ($Host.Version.Major -ge 6 -and $SkipCertificateCheck) {
-      $HashArguments += @{
-        SkipCertificateCheck = $True
-      }
-    } else { Ignore-CertificateValidation }
+    If ($SkipCertificateCheck) {
+      If ($Host.Version.Major -ge 6) {
+        $HashArguments += @{SkipCertificateCheck = $True
+      } else { Ignore-CertificateValidation }
+    }
     $Response = Invoke-RestMethod @HashArguments
     if ( $Response.response.status -eq 'success' ) {
       $Return = $Return + $Response.response
