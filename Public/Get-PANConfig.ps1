@@ -28,8 +28,8 @@ Function Get-PANConfig {
    Path to the file that has the tag data
 
 .EXAMPLE
-    The example below retrieves the entire config from the default firewall and exports it in xml to a file
-    PS C:\> (Get-PANConfig).config.OuterXml | Out-File "Config.xml"
+    The example below retrieves the equavalient of the running config from the default firewall and exports it in xml to a file
+    PS C:\> (Get-PANConfig).config.OuterXml | Out-File "running-config.xml"
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PAN-Power
