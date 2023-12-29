@@ -10,7 +10,7 @@
     This is location from which to get the config
 
 .PARAMETER Show
-    If this is flagged, get the local config instead of the merged config (API show verb instead of get)
+    If this is flagged, get the local config instead of the merged config (API verb of show instead of get)
 
 .PARAMETER Target
     This parameter allows you to redirect queries through Panorama to a managed firewall
