@@ -9,6 +9,9 @@ Function Invoke-PANOperation {
 .PARAMETER Command
     This is the operation command you want to run
 
+.PARAMETER Target
+    This parameter allows you to redirect queries through Panorama to a managed firewall
+
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
 
@@ -27,13 +30,14 @@ Function Invoke-PANOperation {
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PAN-Power
-    Last Edit: 2019-04-05
+    Last Edit: 2022-12-29
     Version 1.0 - initial release
     Version 1.0.1 - Updating descriptions and formatting
     Version 1.0.3 - Remove Direct Credential option
     Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
     Version 1.0.6 - added Edit config and commit and cert check skip for 5
-
+    Version 1.0.8 - added target parameter
+    
 #>
   [CmdletBinding()]
   Param (
@@ -41,6 +45,7 @@ Function Invoke-PANOperation {
     [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
+    [Parameter(Mandatory=$False)]  [string[]]  $Target,
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
     [Parameter(Mandatory=$False)]  [string]    $Key
   )
@@ -76,6 +81,9 @@ Function Invoke-PANOperation {
   ForEach ($Address in $Addresses) {
     $HashArguments = @{
       URI = "https://"+$Address+"/api/?type=$Type&cmd=$Command&"+$Auth
+    }
+    If ($Target) {
+      $HashArguments['URI'] += "&target=$Target"
     }
     If ($SkipCertificateCheck) {
       If ($Host.Version.Major -ge 6) {
