@@ -15,6 +15,9 @@ Function Edit-PANConfig {
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
 
+.PARAMETER Target
+    This parameter allows you to redirect queries through Panorama to a managed firewall
+
 .PARAMETER Key
     This is a key to just use
 
@@ -32,6 +35,7 @@ Function Edit-PANConfig {
     Author: Steve Borba https://github.com/sjborbajr/PAN-Power
     Last Edit: 2019-09-25
     Version 1.0.6 - added Edit config and commit and cert check skip
+    Version 1.0.8 - added target parameter
 
 #>
   [CmdletBinding()]
@@ -42,6 +46,7 @@ Function Edit-PANConfig {
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
+    [Parameter(Mandatory=$False)]  [string[]]  $Target,
     [Parameter(Mandatory=$False)]  [string]    $Key
   )
 
@@ -68,6 +73,9 @@ Function Edit-PANConfig {
   ForEach ($Address in $Addresses) {
     $HashArguments = @{
       URI = "https://"+$Address+"/api/?type=config&action=edit&xpath=$XPath&element=$Data&"+$Auth
+    }
+    If ($Target) {
+      $HashArguments['URI'] += "&target=$Target"
     }
     If ($SkipCertificateCheck) {
       If ($Host.Version.Major -ge 6) {
