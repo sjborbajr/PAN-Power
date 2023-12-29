@@ -6,6 +6,9 @@ Function Invoke-PANCommit {
 .DESCRIPTION
   This runs the operation command passed, to find what operation are possible, ssh to firewall and use "debug cli on" and run command to find the syntax to use.
 
+.PARAMETER Target
+    This parameter allows you to redirect queries through Panorama to a managed firewall
+
 .PARAMETER Addresses
     This is a set of addresses to run the command on, The firewalls must have the same master key for this to work
 
@@ -24,15 +27,17 @@ Function Invoke-PANCommit {
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PAN-Power
-    Last Edit: 2019-09-25
+    Last Edit: 2022-12-29
     Version 1.0.6 - added Edit config and commit
-
+    Version 1.0.8 - added target parameter
+    
 #>
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
+    [Parameter(Mandatory=$False)]  [string[]]  $Target,
     [Parameter(Mandatory=$False)]  [string[]]  $Addresses,
     [Parameter(Mandatory=$False)]  [string]    $Key
   )
@@ -68,6 +73,9 @@ Function Invoke-PANCommit {
   ForEach ($Address in $Addresses) {
     $HashArguments = @{
       URI = "https://"+$Address+"/api/?type=$Type&cmd=<commit></commit>&"+$Auth
+    }
+    If ($Target) {
+      $HashArguments['URI'] += "&target=$Target"
     }
     If ($SkipCertificateCheck) {
       If ($Host.Version.Major -ge 6) {
