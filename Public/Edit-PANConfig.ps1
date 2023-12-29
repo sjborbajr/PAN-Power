@@ -33,7 +33,7 @@ Function Edit-PANConfig {
 
 .NOTES
     Author: Steve Borba https://github.com/sjborbajr/PAN-Power
-    Last Edit: 2019-09-25
+    Last Edit: 2022-12-29
     Version 1.0.6 - added Edit config and commit and cert check skip
     Version 1.0.8 - added target parameter
 
