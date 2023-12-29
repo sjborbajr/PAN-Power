@@ -1,4 +1,4 @@
-﻿Function Get-PANConfig {
+Function Get-PANConfig {
 <#
 .SYNOPSIS
   This will get the config and retun the result in xml
@@ -10,7 +10,7 @@
     This is location from which to get the config
 
 .PARAMETER Show
-    If this is flagged, get the local config instead of the merged config (API verb of show instead of get)
+    If this is flagged, retrieve the merged config vs only the local (API verb show vs get)
 
 .PARAMETER Target
     This parameter allows you to redirect queries through Panorama to a managed firewall
@@ -80,8 +80,8 @@
     }
   }
   
-  #Action of show is the local config as see with show in config mode (#) and get returns the merged config like show configuration merged from exec (>)
-  If ($Show) { $Action = "get" } else { $Action = "show" }
+  #The verb show retrieves the merged config  ("show configuration merged" from exec ">") where get is the local config ("show" in config mode "#")
+  If ($Show) { $Action = "show" } else { $Action = "get" }
 
   #Handle blank XPath to report full config
   If ($XPath)   { $XPath = "&xpath=$XPath" } else {$XPath = "&xpath=/config"}
