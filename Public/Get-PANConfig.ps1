@@ -9,8 +9,8 @@
 .PARAMETER XPath
     This is location from which to get the config
 
-.PARAMETER Running
-    If this is flagged, get the active instead of candidate configuration
+.PARAMETER Show
+    If this is flagged, get the merged config instead of the local config (API show verb instead of get)
 
 .PARAMETER Target
     This parameter allows you to redirect queries through Panorama to a managed firewall
@@ -40,13 +40,13 @@
     Version 1.0.3 - Remove Direct Credential option
     Version 1.0.5 - Add SkipCertificateCheck for pwsh 6+
     Version 1.0.6 - added Edit config and commit and cert check skip for 5
-    Version 1.0.8 - added target parameter
+    Version 1.0.8 - added target parameter, and updated the show vs get config
 
 #>
   [CmdletBinding()]
   Param (
     [Parameter(Mandatory=$False)]  [string]    $XPath,
-    [Parameter(Mandatory=$False)]  [Switch]    $Running,
+    [Parameter(Mandatory=$False)]  [Switch]    $Show,
     [Parameter(Mandatory=$False)]  [Switch]    $SkipCertificateCheck,
     [Parameter(Mandatory=$False)]  [string]    $Tag,
     [Parameter(Mandatory=$False)]  [string]    $Path = '',
@@ -80,8 +80,8 @@
     }
   }
   
-  #Action of show is the active running config and get returns the candidate config
-  If ($Running) { $Action = "show" } else { $Action = "get" }
+  #Action of show is the local config as see with show in config mode (#) and get returns the merged config like show configuration merged from exec (>)
+  If ($Show) { $Action = "get" } else { $Action = "show" }
 
   #Handle blank XPath to report full config
   If ($XPath)   { $XPath = "&xpath=$XPath" } else {$XPath = "&xpath=/config"}
